@@ -1,0 +1,43 @@
+version: "3"
+services:
+  master:
+    build: master
+    ports:
+      - "4505:4505"
+      - "4506:4506"
+    command: service salt-master start
+    privileged: true
+    networks:
+      devops_net:
+          aliases:
+            - master.devopshomework.com
+    volumes:
+      - ./files/:/etc/salt/
+
+  apache:
+    build: minions
+    ports:
+      - "80:80"
+    networks:
+      devops_net:
+        aliases:
+          - apache.devopshomework.com
+
+    depends_on:
+      - master
+
+  memcache:
+    build: minions
+    ports:
+      - "11211:11211"
+    networks:
+      devops_net:
+        aliases:
+          - memcache.devopshomework.com
+    depends_on:
+        - master
+
+
+networks:
+  devops_net:
+    driver: bridge
